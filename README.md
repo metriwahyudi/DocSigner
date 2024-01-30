@@ -7,6 +7,7 @@
 1. `composer install`
 2. `npm install`
 3. `npm run build`
+4. Import `doc_signer.sql` to desired database.
 
 ## Configure
 Configure Bitrix inbound API 
