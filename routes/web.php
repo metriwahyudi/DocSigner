@@ -1,8 +1,12 @@
 <?php
 
+use App\Services\Bitrix24\Facades\Bitrix24;
+use GuzzleHttp\Client;
 use Illuminate\Foundation\Application;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use Ramsey\Uuid\Uuid;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,6 +28,26 @@ Route::get('/', function () {
     ]);
 });
 
+Route::get('/test22',function (\Illuminate\Http\Request $request){
+    \Illuminate\Support\Facades\Storage::put('test/test.json',json_encode($request->all()));
+});
+
+Route::get('/test11',function (){
+    $uuid = Uuid::uuid4()->getHex();
+    $uuid = base_convert($uuid,16,36);
+    $hashed_time = hash('sha1',microtime(true));
+    $hashed_time = base_convert($hashed_time,16,36);
+    dd([
+        $uuid,$hashed_time
+    ]);
+});
+
+Route::get('/test33',function (){
+    \App\Services\Bitrix24\Facades\Bitrix24::selectSpa(143);
+    \App\Services\Bitrix24\Facades\Bitrix24::selectItem(144);
+    return \App\Services\Bitrix24\Facades\Bitrix24::getSPA();
+});
+
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
@@ -34,16 +58,26 @@ Route::middleware([
     })->name('dashboard');
 });
 
+Route::get('/test',function (){
+
+    return view('test');
+});
+
+/**
+ * Signing page
+ */
+Route::get('/sign/{token}',[\App\Http\Controllers\SigningController::class,'index'])->name('signing');
+Route::post('/sign/{token}',[\App\Http\Controllers\SigningController::class,'index']);
+
 
 /**
  * Document handler
  */
 Route::prefix('sign')->as('sign')->group(function (){
-    Route::post('/create/',[\App\Http\Controllers\SignController::class,'create'])->name('.create');
-    Route::get('/verify/{sign}',[\App\Http\Controllers\SignController::class,'verify'])->name('.verify');
+    Route::get('/v/{sign}',[\App\Http\Controllers\SignController::class,'verify'])->name('.verify');
 });
 
-Route::get('/test',function (){
-
-    return \SimpleSoftwareIO\QrCode\Facades\QrCode::generate('Make me into a QrCode!');
-});
+/**
+ * SPA event receiver
+ */
+Route::get('/request-signature',[\App\Http\Controllers\SPAReceiverController::class,'requestSignature']);

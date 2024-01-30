@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Document;
+use App\Models\Signature;
 use App\Models\Signer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -38,30 +39,12 @@ class SignController extends Controller
                 return abort(501,'Upload failed');
             }
         }
-        if (!Document::query()->updateOrInsert(['number'=>$data['number']],$data)){
-            return abort(501,'Document creation failed.');
-        }
-        $document = Document::query()->where('number',$data['number'])->first();
-        if (!isset($document->id)){
-            return abort(501,'Document after creation failed.');
-        }
-        $document->sign = \hash('sha512',microtime(true).'-'.$document->id.'-'.$document->signer_id);
-        if (!$document->save()){
-            return abort(501,'Signing failed.');
-        }
-        $url = route('sign.verify',$document->sign);
-        if ($request->has('link_only')){
-            return response()->json([
-                'url'=>$url
-            ]);
-        }
-        return \SimpleSoftwareIO\QrCode\Facades\QrCode::generate($url);
+
+        return (new \App\Services\Signer\Signer())->makeSignature($data,$request->has('link_only'));
+
     }
     public function verify($sign){
-        $document = Document::query()->where('sign','=',$sign)->first();
-        if (!$document->exists){
-            return abort(404);
-        }
-        return response()->json($document);
+        $signature = Signature::with(['signer'])->where('signature',$sign)->first();
+        dd($signature);
     }
 }

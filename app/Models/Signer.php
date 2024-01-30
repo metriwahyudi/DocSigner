@@ -10,7 +10,8 @@ class Signer extends Model
 {
     use HasFactory, SoftDeletes;
 
-    public function documents(){
-        return $this->hasMany(Signer::class);
+    protected $guarded = [];
+    public function signatures(){
+        return $this->hasMany(Signature::class,'signer_id');
     }
 }
