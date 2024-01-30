@@ -60,7 +60,7 @@ Route::middleware([
 
 Route::get('/test',function (){
 
-    return view('test');
+    return Bitrix24::updateDocument(\App\Models\Document::query()->where('id',9)->first());
 });
 
 /**
@@ -68,6 +68,7 @@ Route::get('/test',function (){
  */
 Route::get('/sign/{token}',[\App\Http\Controllers\SigningController::class,'index'])->name('signing');
 Route::post('/sign/{token}',[\App\Http\Controllers\SigningController::class,'index']);
+Route::get('/doc/download/{document}',[\App\Http\Controllers\SigningController::class,'download'])->name('signing.download');
 
 
 /**

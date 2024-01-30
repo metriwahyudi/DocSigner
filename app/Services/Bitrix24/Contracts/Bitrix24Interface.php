@@ -2,6 +2,7 @@
 
 namespace App\Services\Bitrix24\Contracts;
 
+use App\Models\Document;
 use App\Services\Bitrix24\Bitrix24;
 
 interface Bitrix24Interface
@@ -14,4 +15,6 @@ interface Bitrix24Interface
     public function notifyUser(int $user_id, string $message);
     public function getForm(int $id): array;
     public function getFormList(): array;
+    public function loadDocument(int $template_id): Document|null;
+    public function updateDocument(Document $document): Document|null;
 }

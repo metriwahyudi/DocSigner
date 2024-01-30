@@ -13,11 +13,13 @@ class SPAReceiverController extends Controller
     public function requestSignature(Request $request){
         $data = $request->validate([
             'spa_path'=>['required'],
+            'template_id'=>['required'],
             'signer_id'=>['required'],
             'signer_name'=>['required'],
             'signer_division'=>['required'],
             'signer_position'=>['required'],
             'title'=>['required'],
+            'subject'=>[],
             'target_field'=>['required']
         ]);
         $data['signer_id'] = intval($data['signer_id']);
@@ -52,7 +54,9 @@ class SPAReceiverController extends Controller
             'spa_id'=>$spa_id,
             'item_id'=>$spa_item_id,
             'field_id'=>$data['target_field'],
+            'template_id'=>intval($data['template_id']),
             'title'=>$data['title'],
+            'subject'=>$data['subject'],
             'data'=>json_encode($spa),
             'signing_token'=>$this->getSigningToken(),
             'signing_passcode'=>$this->getPasscode(8)

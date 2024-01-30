@@ -2,6 +2,7 @@
 
 namespace App\Services\Bitrix24\Facades;
 
+use App\Models\Document;
 use Illuminate\Support\Facades\Facade;
 
 /**
@@ -13,6 +14,8 @@ use Illuminate\Support\Facades\Facade;
  * @method static void notifyUser(int $user_id, string $message)
  * @method static array getForm(int $id)
  * @method static array getFormList()
+ * @method static Document|null loadDocument(int $template_id)
+ * @method static Document|null updateDocument(Document $document)
  */
 
 class Bitrix24 extends Facade

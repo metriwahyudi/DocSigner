@@ -2,10 +2,14 @@
 
 namespace App\Services\Bitrix24;
 
+use App\Models\Document;
 use App\Services\Bitrix24\Contracts\Bitrix24Interface;
 use App\Services\Signer\Signer;
 use GuzzleHttp\Client;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
+use Ramsey\Uuid\Uuid;
 
 class Bitrix24 implements Bitrix24Interface
 {
@@ -98,5 +102,91 @@ class Bitrix24 implements Bitrix24Interface
             'Content-Type' => 'application/json',
         ])->post('crm.form.list');
         return $response->json('result');
+    }
+
+    public function loadDocument(int $template_id): Document|null
+    {
+        $client = $this->getClient();
+
+        $response = $client->get('crm.documentgenerator.document.add',[
+            'templateId'=> $template_id,
+            'entityTypeId'=> $this->spaID,
+            'entityId'=> $this->itemID,
+        ]);
+        $data = $response->json('result.document');
+        $download_url = Arr::get($data,'downloadUrlMachine',false);
+        $document_id = Arr::get($data,'id',false);
+        if (!$download_url){
+            return null;
+        }
+        $file_path = $this->downloadAndSave($download_url);
+        if (!$file_path){
+            return null;
+        }
+        /**
+         * @var Document $document
+         */
+        $document = Document::query()->create([
+            'document_id'=>$document_id,
+            'file_path'=>$file_path,
+            'data'=>json_encode($data),
+        ]);
+        if (!$document){
+            return null;
+        }
+        return $document;
+    }
+    private function downloadAndSave($fileUrl, $tmp = true)
+    {
+        $response = Http::setClient(new Client([
+            'base_uri'=>$fileUrl,
+            'verify' => false,
+        ]))->get('');
+
+        $filename = $this->getFilenameFromHeader($response->header('Content-Disposition'));
+
+        if ($response->successful()) {
+            $path = ($tmp ? 'tmp_document/' : 'document/').Uuid::uuid4().'/'.$filename;
+            if(!Storage::put($path, $response->body())){
+                return false;
+            }
+            return $path;
+        } else {
+            return false;
+        }
+    }
+    private function getFilenameFromHeader($contentDispositionHeader)
+    {
+        $re = '/filename\="(.+)"/m';
+        preg_match_all($re, $contentDispositionHeader, $matches, PREG_SET_ORDER, 0);
+
+        return Arr::get($matches,'0.1','noname.tmp');
+    }
+
+    public function updateDocument(Document $document): Document|null
+    {
+        $client = $this->getClient();
+
+        $response = $client->get('crm.documentgenerator.document.update',[
+            'id'=> $document->document_id
+        ]);
+
+        $doc_url = $response->json('result.document.downloadUrlMachine');
+
+        if (!$doc_url) return null;
+
+        $doc_path = $this->downloadAndSave($doc_url,false);
+
+        if (!$doc_path){
+            return null;
+        }
+
+        $document->file_path = $doc_path;
+
+        if (!$document->save()){
+            return null;
+        }
+
+        return $document;
     }
 }

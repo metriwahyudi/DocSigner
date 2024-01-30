@@ -14,4 +14,7 @@ class Signature extends Model
     public function signer(){
         return $this->belongsTo(Signer::class,'signer_id');
     }
+    public function document(){
+        return $this->belongsTo(Document::class,'document_id');
+    }
 }
