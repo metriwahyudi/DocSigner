@@ -79,4 +79,24 @@ class Bitrix24 implements Bitrix24Interface
             'MESSAGE'=>$message
         ]);
     }
+
+    public function getForm(int $id): array
+    {
+        $client = $this->getClient();
+        $response = $client->withHeaders([
+            'Content-Type' => 'application/json',
+        ])->post('crm.form.get', [
+            'id' => $id,
+        ]);
+        return $response->json('result');
+    }
+
+    public function getFormList(): array
+    {
+        $client = $this->getClient();
+        $response = $client->withHeaders([
+            'Content-Type' => 'application/json',
+        ])->post('crm.form.list');
+        return $response->json('result');
+    }
 }

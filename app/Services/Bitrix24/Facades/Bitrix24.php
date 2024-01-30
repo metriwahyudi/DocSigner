@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Facade;
  * @method static void makeSignature(array $data)
  * @method static array getSPA()
  * @method static void notifyUser(int $user_id, string $message)
+ * @method static array getForm(int $id)
+ * @method static array getFormList()
  */
 
 class Bitrix24 extends Facade

@@ -81,3 +81,10 @@ Route::prefix('sign')->as('sign')->group(function (){
  * SPA event receiver
  */
 Route::get('/request-signature',[\App\Http\Controllers\SPAReceiverController::class,'requestSignature']);
+
+
+/**
+ * Form
+ */
+Route::get('/form/{id}',[\App\Http\Controllers\FormController::class,'open'])->name('bitrix.form');
+Route::get('/form-list',[\App\Http\Controllers\FormController::class,'form_list']);

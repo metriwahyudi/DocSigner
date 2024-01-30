@@ -12,4 +12,6 @@ interface Bitrix24Interface
     public function makeSignature(array $data);
     public function getSPA(): array;
     public function notifyUser(int $user_id, string $message);
+    public function getForm(int $id): array;
+    public function getFormList(): array;
 }
