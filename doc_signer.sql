@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Waktu pembuatan: 30 Jan 2024 pada 11.06
+-- Waktu pembuatan: 30 Jan 2024 pada 23.58
 -- Versi server: 8.0.35-0ubuntu0.20.04.1
 -- Versi PHP: 7.4.3-4ubuntu2.19
 
@@ -30,12 +30,10 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `documents` (
   `id` bigint UNSIGNED NOT NULL,
-  `signer_id` int UNSIGNED NOT NULL,
-  `number` varchar(255) NOT NULL,
-  `sign` varchar(512) DEFAULT NULL,
+  `document_id` int UNSIGNED DEFAULT NULL,
   `file_path` varchar(255) DEFAULT NULL,
-  `ref_doc_id` varchar(120) DEFAULT NULL,
-  `reference` text,
+  `file_hash` varchar(255) DEFAULT NULL,
+  `data` text,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -125,8 +123,11 @@ CREATE TABLE `signatures` (
   `spa_id` int UNSIGNED NOT NULL,
   `item_id` int UNSIGNED NOT NULL,
   `field_id` varchar(120) NOT NULL,
+  `template_id` int DEFAULT NULL,
   `signer_id` int UNSIGNED NOT NULL,
+  `document_id` bigint UNSIGNED DEFAULT NULL,
   `title` varchar(120) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `subject` varchar(255) DEFAULT NULL,
   `data` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
   `signature` text,
   `signing_token` varchar(255) DEFAULT NULL,
