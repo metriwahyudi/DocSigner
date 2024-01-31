@@ -32,6 +32,11 @@ Route::get('/test22',function (\Illuminate\Http\Request $request){
     \Illuminate\Support\Facades\Storage::put('test/test.json',json_encode($request->all()));
 });
 
+Route::get('/test22/result',function (\Illuminate\Http\Request $request){
+    $d = \Illuminate\Support\Facades\Storage::get('test/test.json');
+    return json_decode($d);
+});
+
 Route::get('/test11',function (){
     $uuid = Uuid::uuid4()->getHex();
     $uuid = base_convert($uuid,16,36);
